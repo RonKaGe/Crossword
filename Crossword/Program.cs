@@ -1,7 +1,14 @@
-﻿namespace GenerationMaze
+﻿using GUI;
+namespace FinalGeneration
 {
-    class Program()
+    class Program
     {
+        static void Main(string[] args) 
+        {
+            visualBox p = new visualBox();
+            p.ShowMenu();
+        }
+
 
     }
 } 

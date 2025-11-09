@@ -1,16 +1,18 @@
-using System.Text.RegularExpressions;		// библиотека для проверки на русские буквы
-
+using System.Text.RegularExpressions;       // библиотека для проверки на русские буквы
+using DataBase;
 namespace GUI
 {
 	public class visualBox
 
 	{
-		
-		private System.Text.Encoding encoding = System.Text.Encoding.UTF8;		// чтобы не было проблем с кодировкой
-																				//(возможно лишнее, но я не стал удалять)
+		private Words DataWords = new Words();
+		private char[][] WordsArr;
+		public visualBox()
+		{
+			WordsArr = DataWords.JaggedCharArr;
+		}
         private int choice;
 		private bool EndOfProgramm = false;
-		private string? AppendWord;
         string pattern = @"^[а-яА-ЯёЁ]+$"; // условие проверки на русские буквы
 		private string FilePath = "C:\\Users\\Zhuck\\Documents\\Visual Studio 2022\\Crossword\\Crossword\\Words.txt";
 
@@ -31,36 +33,70 @@ namespace GUI
 
 				if (int.TryParse(Console.ReadLine(), out choice))
 				{
-					switch (choice)
+					switch (choice)											//недоработанный еще выбор пункта меню
 					{
 						case 1:
 							AddWord();
+							DataWords.WriteToFile(WordsArr);
 							break;
+						case 2:
+							DeleteLastWord();
+                            DataWords.WriteToFile(WordsArr);
+                            break;
+
 					}
 				}
 
 
 			}
 		}
-	private void AddWord()
+	private void AddWord()																//добавление слова в конец массива
 		{
-			Console.WriteLine("Введите слово: ");
-			AppendWord = Console.ReadLine();
-			if (AppendWord != null && Regex.IsMatch(AppendWord, pattern))
+			string AppendWord = null;
+            while (AppendWord == null || !Regex.IsMatch(AppendWord, pattern))  
 			{
-				File.AppendAllText(FilePath, AppendWord.ToUpper()+Environment.NewLine, encoding); // добавляем слово в конец с переходом на новую строку 
-                Console.WriteLine("Слово успешно добавлено");
+                Console.WriteLine("Введите новое слово: ");
+                AppendWord = Console.ReadLine();
 
             }
-            else
-			{
-				Console.WriteLine("Ошибка ввода слова!");
-			}
-			Console.WriteLine("Нажмите на любую клавишу, чтобы продолжить...");
+            Array.Resize(ref WordsArr, WordsArr.Length + 1);
+			WordsArr[WordsArr.Length - 1]=AppendWord.ToUpper().ToCharArray();
+			DataWords.WriteToFile(WordsArr);
 			Console.ReadKey();
+        }
+	private void DeleteLastWord()													// удаление последнего слова из массива
+		{
+			Array.Resize(ref WordsArr, WordsArr.Length - 1);
+        }
+	private void SwapArr(char[][] WordsArr, int FirstIndex, int SecondIndex )
+		{
+			char[] Temp = WordsArr[FirstIndex];
+			WordsArr[FirstIndex] = WordsArr[SecondIndex];
+			WordsArr[SecondIndex] = Temp;
+			
 		}
-
-	public void AddStartWords() // костыль на добавление начальных слов, в будущем возможно уберу (в данный момент нигде не используется)
+        public void ShowData()
+        {
+            foreach (char[] p in WordsArr)
+            {
+                Console.WriteLine(p);
+            }
+        }
+        void Sort()																	//сортируем слова по их размеру 
+		{
+			for (int i = 0; i < WordsArr.Length - 1; i++)
+			{
+				for (int j = 0; j < WordsArr.Length - i - 1; j++)
+				{
+					if (WordsArr[j].Length < WordsArr[j+1].Length)
+					{
+						SwapArr(WordsArr, j, j+1);
+					}
+				}
+			}
+		}
+       
+        public void AddStartWords() // костыль на добавление начальных слов, в будущем возможно уберу (в данный момент нигде не используется)
 		{
 			File.AppendAllText(FilePath,"АБРИС\nЯМА\nВДОХНОВЕНИЕ\nЩЕЛЬ\nГАРАЖ\nЭРА\nБИБЛИОТЕКА\nОВОД\nЖЕМЧУГ\nАКВАРИУМ\nУХО\nДОЗОР\nВЕЛОСИПЕД\nИНЕЙ\nАВТОР\n");
 

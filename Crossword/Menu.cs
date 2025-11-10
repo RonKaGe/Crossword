@@ -14,7 +14,7 @@ namespace GUI
         private int choice;
 		private bool EndOfProgramm = false;
         string pattern = @"^[а-€ј-яЄ®]+$"; // условие проверки на русские буквы
-		private string FilePath = "C:\\Users\\Zhuck\\Documents\\Visual Studio 2022\\Crossword\\Crossword\\Words.txt";
+		private string FilePath = "Words.txt";
 
 		public void ShowMenu()
 		{

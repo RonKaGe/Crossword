@@ -43,6 +43,15 @@ namespace GUI
 							DeleteLastWord();
                             DataWords.WriteToFile(WordsArr);
                             break;
+						case 3:
+							Console.WriteLine("¬ведите индекс удал€емого элемента");
+							if(int.TryParse(Console.ReadLine(), out choice))
+							{
+								DeleteWordIndex(choice);
+								DataWords.WriteToFile(WordsArr);
+							}
+							
+							break;
 
 					}
 				}
@@ -64,6 +73,13 @@ namespace GUI
 			DataWords.WriteToFile(WordsArr);
 			Console.ReadKey();
         }
+	private void DeleteWordIndex(int Index)
+		{
+			char[] Temp = WordsArr[WordsArr.Length-1];
+			Array.Resize(ref WordsArr,WordsArr.Length-1);
+			WordsArr[Index] = Temp;
+            Array.Resize(ref WordsArr, WordsArr.Length + 1);
+		}
 	private void DeleteLastWord()													// удаление последнего слова из массива
 		{
 			Array.Resize(ref WordsArr, WordsArr.Length - 1);

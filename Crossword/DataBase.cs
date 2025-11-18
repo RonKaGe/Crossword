@@ -4,19 +4,24 @@ namespace DataBase
 
     class Words
     {
+
         private string FilePath = "Words.txt";
         public char[][] JaggedCharArr;
+        public void AddStartWords() // костыль на добавление начальных слов
+        {
+            File.AppendAllText(FilePath, "АБРИС\nЯМА\nВДОХНОВЕНИЕ\nЩЕЛЬ\nГАРАЖ\nЭРА\nБИБЛИОТЕКА\nОВОД\nЖЕМЧУГ\nАКВАРИУМ\nУХО\nДОЗОР\nВЕЛОСИПЕД\nИНЕЙ\nАВТОР\n");
+
+        }
         public Words()                                                          // конструктор класса(читает файл и заполняет массив данными из файла)
         {
-            int numline = File.ReadLines(FilePath).Count();
-            this.JaggedCharArr = new char[numline][];
             int i = 0;
             try
             {
-                string[] Lines = File.ReadAllLines(FilePath,Encoding.UTF8);
-                if (Lines.Length > 0) 
+                string[] Lines = File.ReadAllLines(FilePath, Encoding.UTF8);
+                JaggedCharArr = new char[Lines.Length][];
+                if (Lines.Length > 0)
                 {
-                    foreach(string Line in Lines)
+                    foreach (string Line in Lines)
                     {
                         JaggedCharArr[i++] = Line.ToCharArray();
                     }
@@ -30,13 +35,17 @@ namespace DataBase
 
             catch (FileNotFoundException)                                       // обработка ошибок
             {
-                Console.WriteLine("Файл не найден"); return;
+                File.Create(FilePath).Close();
+                AddStartWords();
+                return;
             }
-           
+
 
 
         }
-    public void ShowData()                                                  //отображение массива 
+    
+        
+        public void ShowData()                                                  //отображение массива 
         {
             foreach(char[] p in JaggedCharArr)
             {

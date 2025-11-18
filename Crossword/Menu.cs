@@ -1,13 +1,14 @@
 using System.Text.RegularExpressions;       // библиотека для проверки на русские буквы
 using System.Xml.Serialization;
 using DataBase;
+using Crossword;
 namespace GUI
 {
 	public class visualBox
 
 	{
 		private Words DataWords = new Words();
-		private char[][] WordsArr;
+		public char[][] WordsArr;
 		public visualBox()
 		{
 			WordsArr = DataWords.JaggedCharArr;
@@ -61,7 +62,10 @@ namespace GUI
 							ShowArr();
 							break;
 						case 6:
-							break;
+							algorithm WorkWithGen = new algorithm();
+							WorkWithGen.GenerationCros();
+                            WaitingForButton();
+                            break;
 						case 7:
 							EndOfProgramm = true;
 							break;
@@ -132,7 +136,7 @@ namespace GUI
 		{
 
 		}
-        void Sort()																	//сортируем слова по их размеру 
+        public void Sort(char[][] WordsArr)																	//сортируем слова по их размеру 
 		{
 			for (int i = 0; i < WordsArr.Length - 1; i++)
 			{

@@ -5,91 +5,142 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using GUI;
 
+namespace Crossword;
 
-namespace GUI
+public class algorithm
 {
-    public class algorithm
+    private visualBox menu;
+    private Random random;
+    private char[][] words;
+    private char[,] grid;
+    private int rows=50;
+    private int cols=50;
+
+    public List<char[]> WordsToPlace = new List<char[]>();
+    List<PlaceWord> placeWords = new List<PlaceWord>();
+    List<char[]> MissWords = new List<char[]>();
+
+    public algorithm()
     {
-        private char[][] grid;
-        private Random random;
-        private List<string> words;
-
-        public algorithm()
+        menu = new visualBox();
+        random = new Random();
+        grid = new char[rows, cols];
+        words = menu.WordsArr;
+        for (int i = 0; i < rows; i++)
         {
-            random = new Random();
-            grid = new char[0][];
-            words = new List<string>();
-        }
-        // Основной метод генерации массива
-        public char[][] Generate(List<string> inputWords)  // Метод, который возвращает рваный массив 
-        {
-            if (inputWords == null || inputWords.Count == 0)
-                throw new ArgumentException("Список слов не может быть пустым");
-
-            var words = inputWords.Select(w => w.Trim().ToUpper()) // Тут приводим слова к верхнему регистру 
-                .Where(w => !string.IsNullOrEmpty(w))             // и убираем пробелы
-                .ToList();
-
-            if (words.Count == 0)
-                throw new ArgumentException("Нет валидных слов для генерации");
-
-            words = words.OrderByDescending(w => w.Length).ToList(); // Сортировка слов по длине
-
-            BuildCrossword(); // Построение кроссворда
-            return grid;
-        }
-        private void BuildCrossword()
-        {
-            PlaceFirstWord(words[0]); // Размещ первое слово
-
-            for (int i = 1; i < words.Count; i++) // Размещ остальные слова
+            for (int j = 0; j < cols; j++)
             {
-                if (!TryPlaceWord(words[i]))
-                {
-                    Console.WriteLine("Не удалось разместить слово: {words[i]}");
-                }
+                grid[i, j] = ' '; // Используем точку как заполнитель
             }
-        }
-        private void PlaceFirstWord(string word) // Размещ первого слова
-        {
-
-            grid = new char[1][]; // Созд массив из одной строки с первым словом
-            grid[0] = word.ToCharArray();
-
-            Console.WriteLine("Размещено первое слово: {word}");
-        }
-        private bool TryPlaceWord(string word) // Размещ слово в существующей структуре
-        {
-            for (int attempt = 0; attempt < 50; attempt++) // Разные попытки
-            {
-                bool horizontal = random.Next(2) == 0; // Тип рандомно ставим либо горизонтально, либо вертикально 
-
-                if (TryFindAndPlace(word, horizontal))
-                    return true;
-
-                if (TryFindAndPlace(word, !horizontal))
-                    return true;
-            }
-            return false;
-        }
-        private bool TryFindAndPlace(string word, bool horizontal)
-        {
-            var intersections = FindAllIntersections(word); // Ищем все возможные пересечения
-
-            foreach (var intersection in intersections)
-            {
-                if (horizontal && CanPlaceHorizontal(word, intersection))
-                {
-                    return true;
-                }
-                else if (!horizontal && CanPlaceVertical(word, intersection))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
+    public void ShowCrossword()
+    {
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++) 
+            {
+                Console.Write(grid[i, j]);
+            }
+            Console.WriteLine();
+        }
+          
+    }
+    private void TakeWords()
+    {
+        if (words.Length > 20) 
+        {
+            Array.Resize(ref words, 20);
+        }
+        menu.Sort(words);
+        WordsToPlace.AddRange(words);
+    }
+   
+    private void CheckWord(char[] WordToCheck)
+    {
+        for (int i = 0; i < placeWords.Count; i++) 
+        {
+            int LetterCounter = 0;
+            foreach(var letter in WordToCheck)
+            {
+                for(int j = 0; j < placeWords[i].Word.Length;j++)
+                {
+                    int CurrentX;
+                    int CurrentY;
+                    if (letter == placeWords[i].Word[j])
+                    {
+
+                        if (placeWords[i].IsHorisontal)
+                        {
+                            CurrentX = placeWords[i].StartX + j;
+                            CurrentY = placeWords[i].StartY;
+
+
+                        }
+                        else
+                        {
+                            CurrentX = placeWords[i].StartX;
+                            CurrentY = placeWords[i].StartY + j;
+                        }
+
+                        if (CurrentX >= 0 && CurrentY >= 0 && CurrentX < 50 && CurrentY < 50)
+                        {
+                            if (placeWords[i].IsHorisontal) 
+                            {
+
+                            }
+                        }
+                        else { continue; }
+                        
+                    }
+                }
+                LetterCounter++;
+            }
+        }
+    }
+    public void GenerationCros()
+    {
+        TakeWords();
+        int FirstStartX = (cols - WordsToPlace[0].Length) / 2;
+        int FirstStartY = rows / 2;
+        for (int i = 0; i < WordsToPlace[0].Length; i++)
+        {
+            grid[FirstStartY, FirstStartX + i] = WordsToPlace[0][i];
+        }
+        PlaceWord NewPlaceWord = new PlaceWord
+        {
+            Word = WordsToPlace[0],
+            StartY = FirstStartY,
+            StartX = FirstStartX,
+            IsHorisontal = true
+        };
+        placeWords.Add(NewPlaceWord);
+        WordsToPlace.RemoveAt(0);
+        while (WordsToPlace.Count != 0)
+        {
+            for (int i = 0; i < WordsToPlace.Count; i++) 
+            {
+                char[] WordToTry = WordsToPlace[i];
+
+            }
+        }
+
+        ShowCrossword();
+    }
+
 }
+
+public class PlaceWord
+{
+    public char[] Word { get; set; } 
+    public int StartX {  get; set; }
+    public int StartY { get; set; }
+    public bool IsHorisontal {  get; set; }
+
+}
+
+    // Основной метод генерации массива
+    
 

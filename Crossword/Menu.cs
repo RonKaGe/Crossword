@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;       // библиотека для проверки на русские буквы
+using System.Xml.Serialization;
 using DataBase;
 namespace GUI
 {
@@ -50,9 +51,20 @@ namespace GUI
 								DeleteWordIndex(choice);
 								DataWords.WriteToFile(WordsArr);
 							}
-							
+							break;
+						case 4:
+							ClearAll();
+							DataWords.WriteToFile(WordsArr);
 							break;
 
+						case 5:
+							ShowArr();
+							break;
+						case 6:
+							break;
+						case 7:
+							EndOfProgramm = true;
+							break;
 					}
 				}
 
@@ -66,12 +78,11 @@ namespace GUI
 			{
                 Console.WriteLine("Введите новое слово: ");
                 AppendWord = Console.ReadLine();
-
             }
             Array.Resize(ref WordsArr, WordsArr.Length + 1);
 			WordsArr[WordsArr.Length - 1]=AppendWord.ToUpper().ToCharArray();
 			DataWords.WriteToFile(WordsArr);
-			Console.ReadKey();
+			WaitingForButton();
         }
 	private void DeleteWordIndex(int Index)
 		{
@@ -91,6 +102,11 @@ namespace GUI
 			WordsArr[SecondIndex] = Temp;
 			
 		}
+	private void ClearAll()
+		{
+			Array.Resize(ref WordsArr, 0);
+
+		}
         public void ShowData()
         {
             foreach (char[] p in WordsArr)
@@ -98,6 +114,24 @@ namespace GUI
                 Console.WriteLine(p);
             }
         }
+		private void ShowArr()
+		{
+			foreach(char[] p in WordsArr)
+			{
+				Console.WriteLine(p);
+			}
+			WaitingForButton();
+
+		}
+		private void WaitingForButton()
+		{
+			Console.WriteLine("Нажмите на любую клавишу...");
+			Console.ReadKey();
+		}
+		private void Exit()
+		{
+
+		}
         void Sort()																	//сортируем слова по их размеру 
 		{
 			for (int i = 0; i < WordsArr.Length - 1; i++)
@@ -112,10 +146,6 @@ namespace GUI
 			}
 		}
        
-        public void AddStartWords() // костыль на добавление начальных слов, в будущем возможно уберу (в данный момент нигде не используется)
-		{
-			File.AppendAllText(FilePath,"АБРИС\nЯМА\nВДОХНОВЕНИЕ\nЩЕЛЬ\nГАРАЖ\nЭРА\nБИБЛИОТЕКА\nОВОД\nЖЕМЧУГ\nАКВАРИУМ\nУХО\nДОЗОР\nВЕЛОСИПЕД\nИНЕЙ\nАВТОР\n");
 
-        }
 	}
 }

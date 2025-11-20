@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Microsoft.VisualBasic;
 
 namespace GUI
 {
@@ -89,6 +90,99 @@ namespace GUI
             }
             return false;
         }
+        //Поиск всех возможных пересечений слова с существующей сеткой
+        private List<(int row, int col, ControlChars letter, int wordIndex)> FindAllIntersections(string word)
+        {
+            var intersections = new List<(int row, int col, char letter, int wordIndex)>(); // это нужно, чтобы вставить новое слово и определить,
+                                        // куда оно пойдёт (координаты строки и столбца, какие буквы будут стоять, их координата в самом слове
+
+            for (int row = 0; row < grid.Length; row++)
+            {
+                if (grid[row] == null) continue;
+
+                for (int col = 0; col < grid[row].Length; col++) // ????
+                {
+                    char currentChar = grid[row][col]; // Игнор пустых клеток
+                    if (currentChar != '\0')
+                    {
+                        // ищем совпадения букв
+                        for (int wordIndex = 0; wordIndex < word.Length; wordIndex++)
+                        {
+                            if (word[wordIndex] == currentChar)
+                            {
+                                intersections.Add((row, Collection, currentChar, wordIndex));
+                            }
+                        }
+                    }
+                }
+            }
+            return intersections;
+        }
+
+        // проверка возможности размещения горизонтального слова
+        private bool CanPlaceHorizontal(string word, (int row, int col, char letter, int wordIndex) intersections)
+        {
+            int startCol = intersections.col - intersections.wordIndex; // вычисл начальный столбец для слова
+            int endCol = startCol + word.Length - 1; // вычисл конечный столбец для слова
+            if (startCol < 0)
+                return false;
+
+            int currentRow = intersections.row;
+            int currentRowLenght = grid[currentRow].Length;
+
+            // проверяем, нет ли конфликтов с существующими буквами
+            for (int i = 0; i < word.Length; i++)
+            {
+                int checkCol = startCol + i;
+                
+                if (checkCol < currentRowLenght && checkCol >= 0) // ?????
+                {
+                    // если клетка уже занята, проверяем совпадение 
+                    if (grid[currentRow][checkCol] != '\0' && grid[currentRow][checkCol] != word[i])
+                        return false; // ??????
+                }
+            }
+            return true;
+        }
+        // такая же проверка, только теперь вертикального слова
+        private bool CanPlaceVertical(string word, (int row, int col, char letter, int wordIndex) intersections)
+        {
+            int startRow = intersections.row - intersections.wordIndex;
+            int endRow = startRow + word.Length - 1;
+
+            // проверка границ 
+            if (startRow < 0) 
+                return false;
+
+            int currentCol = intersections.col;
+
+            // проверяем конфликты
+            for (int i = 0;i < word.Length;i++)
+            {
+                int checkRow = startRow + i;
+
+                if (checkRow < grid.Length && checkRow >= 0)
+                {
+                    // если строка существует 
+                    if (grid[checkRow] != null && currentCol < grid[checkRow].Length) // весь метод ?????
+                    {
+                        if (grid[checkRow][currentCol] != '\0' && grid[checkRow][currentCol] != word[i])
+                            return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        // размещ горизонт слова
+        private void PlaceHorizontal(string word, (int row, int col, char letter, int wordIndex) intersection)
+        {
+            int startCol = intersection.col - intersection.wordIndex;
+            int currentRow = intersection.row;
+            int requiredLenght = startCol + word.Length;
+        }
+
     }
+       
 }
 

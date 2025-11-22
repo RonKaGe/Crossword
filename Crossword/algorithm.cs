@@ -77,21 +77,25 @@ namespace GUI
         {
             var intersections = FindAllIntersections(word); // Ищем все возможные пересечения
 
-            foreach (var intersection in intersections)
+            var shuffledIntersections = intersections.OrderBy(x => random.Next()).ToList();
+
+            foreach (var intersection in shuffledIntersections)
             {
                 if (horizontal && CanPlaceHorizontal(word, intersection))
                 {
+                    PlaceHorizontal(word, intersection);
                     return true;
                 }
                 else if (!horizontal && CanPlaceVertical(word, intersection))
                 {
+                    PlaceVertical(word, intersection);
                     return true;
                 }
             }
             return false;
         }
         //Поиск всех возможных пересечений слова с существующей сеткой
-        private List<(int row, int col, ControlChars letter, int wordIndex)> FindAllIntersections(string word)
+        private List<(int row, int col, char letter, int wordIndex)> FindAllIntersections(string word)
         {
             var intersections = new List<(int row, int col, char letter, int wordIndex)>(); // это нужно, чтобы вставить новое слово и определить,
                                         // куда оно пойдёт (координаты строки и столбца, какие буквы будут стоять, их координата в самом слове
@@ -110,7 +114,7 @@ namespace GUI
                         {
                             if (word[wordIndex] == currentChar)
                             {
-                                intersections.Add((row, Collection, currentChar, wordIndex));
+                                intersections.Add((row, col, currentChar, wordIndex));
                             }
                         }
                     }
@@ -180,6 +184,79 @@ namespace GUI
             int startCol = intersection.col - intersection.wordIndex;
             int currentRow = intersection.row;
             int requiredLenght = startCol + word.Length;
+
+            // расширяем строку, если это нужно
+            if (requiredLenght > grid[currentRow].Length)
+            {
+                Array.Resize(ref grid[currentRow], requiredLenght);
+            }
+
+            // заполняем слово 
+            for (int i = 0; i < word.Length; i++)
+            {
+                grid[currentRow][startCol + 1] = word[i];
+            }
+            Console.WriteLine("Размещено горизонтально: {word}");
+        }
+
+        // то же самое размещение, но теперь вертикального слова 
+        private void PlaceVertical(string word, (int row, int col, char letter, int wordIndex) intersection)
+        {
+            int startRow = intersection.row - intersection.wordIndex;
+            int currentCol = intersection.col;
+            int requiredRows = startRow + word.Length; 
+
+            if (requiredRows > grid.Length)
+            {
+                Array.Resize(ref grid, requiredRows);
+            }
+
+            for (int i = 0;i < word.Length;i++)
+            {
+                int currentRow = startRow + i;
+
+                // Если стркоа не существует, создаём её
+                if (grid[currentRow] == null)
+                {
+                    grid[currentRow] = new char[currentCol + 1];
+                
+                }
+                // Если столбца не существует, расширяем строку
+                else if (currentCol >= grid[currentRow].Length)
+                {
+                    Array.Resize(ref grid[currentRow], currentCol + 1);
+                }
+                grid[currentRow][currentCol] = word[i];
+            }
+            Console.WriteLine("Размещено вертикально: {word}");
+        }
+
+        // Визуализация кроссворда в консоли
+        public void PrintCrossword()
+        {
+            if (grid == null || grid.Length == 0)
+            {
+                Console.WriteLine("Кроссворд пуст: ");
+                return;
+            }
+
+            //Находим максимальную ширину длля красивого вывода 
+            int maxWidth = grid.Max(row => row?.Length ?? 0); // ???????
+
+            Console.WriteLine("\n Сгенерированный кроссворд: ");
+            Console.WriteLine(new string('=', maxWidth * 2 + 3));
+
+            for (int i = 0; i < grid.Length; i++)
+            {
+                Console.Write("| ");
+                if (grid[i] != null)
+                {
+                    for (int j = 0; j < grid[i].Length; j++)
+                    {
+                        char cell = grid[i][j];
+                    }
+                }
+            }
         }
 
     }

@@ -24,11 +24,10 @@ namespace GUI
 				Console.Clear();
 				Console.WriteLine("1. Добавить слово");
 				Console.WriteLine("2. Удалить последнее слово");
-				Console.WriteLine("3. Удалить слово по индексу");
-				Console.WriteLine("4. Очистить все");
-				Console.WriteLine("5. Вывести список слов");
-				Console.WriteLine("6. Вывести Кроссворд");
-				Console.WriteLine("7. Выход");
+				Console.WriteLine("3. Очистить все");
+				Console.WriteLine("4. Вывести список слов");
+				Console.WriteLine("5. Вывести Кроссворд");
+				Console.WriteLine("6. Выход");
 
 				Console.Write("Выберите пункт меню: ");
 
@@ -45,25 +44,21 @@ namespace GUI
                             DataWords.WriteToFile(WordsArr);
                             break;
 						case 3:
-							Console.WriteLine("Введите индекс удаляемого элемента");
-							if(int.TryParse(Console.ReadLine(), out choice))
-							{
-								DeleteWordIndex(choice);
-								DataWords.WriteToFile(WordsArr);
-							}
-							break;
-						case 4:
 							ClearAll();
 							DataWords.WriteToFile(WordsArr);
 							break;
-
-						case 5:
+						case 4:
 							ShowArr();
 							break;
-						case 6:
+						case 5:
+							WaitingForButton();
 							break;
-						case 7:
+						case 6:
 							EndOfProgramm = true;
+							break;
+						default:
+							Console.WriteLine("Ошибка ввода");
+							WaitingForButton();
 							break;
 					}
 				}
@@ -84,24 +79,14 @@ namespace GUI
 			DataWords.WriteToFile(WordsArr);
 			WaitingForButton();
         }
-	private void DeleteWordIndex(int Index)
-		{
-			char[] Temp = WordsArr[WordsArr.Length-1];
-			Array.Resize(ref WordsArr,WordsArr.Length-1);
-			WordsArr[Index] = Temp;
-            Array.Resize(ref WordsArr, WordsArr.Length + 1);
-		}
+	
 	private void DeleteLastWord()													// удаление последнего слова из массива
 		{
 			Array.Resize(ref WordsArr, WordsArr.Length - 1);
         }
-	private void SwapArr(char[][] WordsArr, int FirstIndex, int SecondIndex )
-		{
-			char[] Temp = WordsArr[FirstIndex];
-			WordsArr[FirstIndex] = WordsArr[SecondIndex];
-			WordsArr[SecondIndex] = Temp;
+
 			
-		}
+		
 	private void ClearAll()
 		{
 			Array.Resize(ref WordsArr, 0);
@@ -128,24 +113,15 @@ namespace GUI
 			Console.WriteLine("Нажмите на любую клавишу...");
 			Console.ReadKey();
 		}
-		private void Exit()
+		public List<string> ListOfWords()
 		{
-
-		}
-        void Sort()																	//сортируем слова по их размеру 
-		{
-			for (int i = 0; i < WordsArr.Length - 1; i++)
+			List<string> list = new List<string>();
+			for(int i = 0;i < WordsArr.Length; i++)
 			{
-				for (int j = 0; j < WordsArr.Length - i - 1; j++)
-				{
-					if (WordsArr[j].Length < WordsArr[j+1].Length)
-					{
-						SwapArr(WordsArr, j, j+1);
-					}
-				}
+                list.Add(new string(WordsArr[i]));
 			}
+			return list;
 		}
-       
 
 	}
 }

@@ -28,8 +28,9 @@ namespace DataBase
                 }
                 else
                 {
-                    Console.WriteLine("Ôאיכ Ïףסע");
-                    return;
+                    Console.WriteLine("Ôאיכ Ïףסע, גגמהטל באחמגûו סכמגא");
+                    AddStartWords();
+                    
                 }
             }
 

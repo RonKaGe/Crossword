@@ -44,8 +44,8 @@ namespace DataBase
 
 
         }
-    
-        
+
+
         public void ShowData()                                                  //отображение массива 
         {
             foreach(char[] p in JaggedCharArr)

@@ -194,7 +194,7 @@ namespace GUI
             // заполняем слово 
             for (int i = 0; i < word.Length; i++)
             {
-                grid[currentRow][startCol + 1] = word[i];
+                grid[currentRow][startCol + i] = word[i];
             }
             Console.WriteLine("Размещено горизонтально: {word}");
         }

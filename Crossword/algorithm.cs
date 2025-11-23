@@ -104,7 +104,7 @@ namespace GUI
             {
                 if (grid[row] == null) continue;
 
-                for (int col = 0; col < grid[row].Length; col++) // ????
+                for (int col = 0; col < grid[row].Length; col++) 
                 {
                     char currentChar = grid[row][col]; // Игнор пустых клеток
                     if (currentChar != '\0')
@@ -139,11 +139,11 @@ namespace GUI
             {
                 int checkCol = startCol + i;
                 
-                if (checkCol < currentRowLenght && checkCol >= 0) // ?????
+                if (checkCol < currentRowLenght && checkCol >= 0) 
                 {
                     // если клетка уже занята, проверяем совпадение 
                     if (grid[currentRow][checkCol] != '\0' && grid[currentRow][checkCol] != word[i])
-                        return false; // ??????
+                        return false; 
                 }
             }
             return true;
@@ -168,7 +168,7 @@ namespace GUI
                 if (checkRow < grid.Length && checkRow >= 0)
                 {
                     // если строка существует 
-                    if (grid[checkRow] != null && currentCol < grid[checkRow].Length) // весь метод ?????
+                    if (grid[checkRow] != null && currentCol < grid[checkRow].Length)
                     {
                         if (grid[checkRow][currentCol] != '\0' && grid[checkRow][currentCol] != word[i])
                             return false;
@@ -241,7 +241,7 @@ namespace GUI
             }
 
             //Находим максимальную ширину длля красивого вывода 
-            int maxWidth = grid.Max(row => row?.Length ?? 0); // ???????
+            int maxWidth = grid.Max(row => row?.Length ?? 0);
 
             Console.WriteLine("\n Сгенерированный кроссворд: ");
             Console.WriteLine(new string('=', maxWidth * 2 + 3));
@@ -250,13 +250,31 @@ namespace GUI
             {
                 Console.Write("| ");
                 if (grid[i] != null)
-                {
+                { // выводим все символы текущей строки
                     for (int j = 0; j < grid[i].Length; j++)
                     {
                         char cell = grid[i][j];
+                        // если клетка пустая - ставим точку, иначе букву 
+                        Console.Write((cell == '\0' ? '.' : cell) + " ");
+                    }
+                    // дополняем оставшиеся клетки точками 
+                    for (int j = grid[i].Length; j < maxWidth; j++)
+                    {
+                        Console.Write(". ");
                     }
                 }
+                else
+                {
+                    // пустая строка - заполняем всё точками 
+                    for (int j = 0; j < maxWidth; j++)
+                    {
+                        Console.Write(". ");
+                    }
+                }
+                Console.WriteLine("|"); // правая граница + переход на новую строку
             }
+            // нижняя граница 
+            Console.WriteLine(new string('=', maxWidth * 2 + 3 ));
         }
 
     }

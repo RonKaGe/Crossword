@@ -9,20 +9,20 @@ using Microsoft.VisualBasic;
 using GUI;
 namespace CrosswordGen
 {
-public class algorithm
-{
-    private char[][] grid;
-    private Random random;
-    private List<string> words;
-
-
-    public algorithm()
+    public class algorithm
     {
-        random = new Random();
-        grid = new char[0][];
-        visualBox menu = new visualBox();
-        words = menu.ListOfWords();
-    }
+        private char[][] grid;
+        private Random random;
+        private List<string> words;
+
+
+        public algorithm()
+        {
+            random = new Random();
+            grid = new char[0][];
+            visualBox menu = new visualBox();
+            words = menu.ListOfWords();
+        }
         // Основной метод генерации массива
         public char[][] Generate(List<string> inputWords)  // Метод, который возвращает рваный массив 
         {
@@ -42,7 +42,7 @@ public class algorithm
             return grid;
         }
         private void BuildCrossword()
-            {
+        {
             PlaceFirstWord(words[0]); // Размещ первое слово
 
             for (int i = 1; i < words.Count; i++) // Размещ остальные слова
@@ -50,11 +50,11 @@ public class algorithm
                 if (!TryPlaceWord(words[i]))
                 {
                     Console.WriteLine($"Не удалось разместить слово: {words[i]}");
+                }
             }
         }
-    }
         private void PlaceFirstWord(string word) // Размещ первого слова
-    {
+        {
 
             grid = new char[1][]; // Созд массив из одной строки с первым словом
             grid[0] = word.ToCharArray();
@@ -65,57 +65,93 @@ public class algorithm
         {
             for (int attempt = 0; attempt < 50; attempt++) // Разные попытки
             {
-                bool horizontal = random.Next(2) == 0; // Тип рандомно ставим либо горизонтально, либо вертикально 
+                bool placeVertical = (attempt % 2 == 0);
 
-                if (TryFindAndPlace(word, horizontal))
+                if (TryFindAndPlace(word, placeVertical))
                     return true;
 
-                if (TryFindAndPlace(word, !horizontal))
-                    return true;
             }
             return false;
         }
         private bool TryFindAndPlace(string word, bool horizontal)
+
         {
             var intersections = FindAllIntersections(word); // Ищем все возможные пересечения
-          
             var shuffledIntersections = intersections.OrderBy(x => random.Next()).ToList();
 
             foreach (var intersection in shuffledIntersections)
-    {
+            {
                 if (horizontal && CanPlaceHorizontal(word, intersection))
-        {
+                {
                     PlaceHorizontal(word, intersection);
                     return true;
-        }
+                }
                 else if (!horizontal && CanPlaceVertical(word, intersection))
                 {
                     PlaceVertical(word, intersection);
                     return true;
-    }
+                }
             }
             return false;
+
+        if (intersections.Count == 0)
+            return true; 
+
+        foreach (var intersection in intersections)
+            {
+                if (IsHorizontalWordAt(intersection.row, intersection.col))
+                    return true;
+
+                if (IsVerticalWordAt(intersection.row, intersection.col))
+                    return false;
+            }
+            return random.Next(2) == 0;
         }
-        //Поиск всех возможных пересечений слова с существующей сеткой
+
+        private bool IsHorizontalWordAt(int row, int col)
+        {
+            if (grid[row] == null || col >= grid[row].Length)
+                return false;
+
+            bool hasLeftNeighbor = col > 0 && grid[row][col - 1] != '\0';
+            bool hasRightNeighbor = col < grid[row].Length - 1 && grid[row][col + 1] != '\0';
+
+            return hasLeftNeighbor || hasRightNeighbor;
+        }
+
+        private bool IsVerticalWordAt(int row, int col)
+        {
+            bool hasTopNeighbor = row > 0 &&
+                                 grid[row - 1] != null &&
+                                 col < grid[row - 1].Length &&
+                                 grid[row - 1][col] != '\0';
+
+            bool hasBottomNeighbor = row < grid.Length - 1 &&
+                                    grid[row + 1] != null &&
+                                    col < grid[row + 1].Length &&
+                                    grid[row + 1][col] != '\0';
+
+            return hasTopNeighbor || hasBottomNeighbor;
+        }
         private List<(int row, int col, char letter, int wordIndex)> FindAllIntersections(string word)
         {
             var intersections = new List<(int row, int col, char letter, int wordIndex)>(); // это нужно, чтобы вставить новое слово и определить,
-                                        // куда оно пойдёт (координаты строки и столбца, какие буквы будут стоять, их координата в самом слове
-   
+                                                                                            // куда оно пойдёт (координаты строки и столбца, какие буквы будут стоять, их координата в самом слове
+
             for (int row = 0; row < grid.Length; row++)
-    {
+            {
                 if (grid[row] == null) continue;
 
-                for (int col = 0; col < grid[row].Length; col++) 
-        {
+                for (int col = 0; col < grid[row].Length; col++)
+                {
                     char currentChar = grid[row][col]; // Игнор пустых клеток
                     if (currentChar != '\0')
-            {
+                    {
                         // ищем совпадения букв
                         for (int wordIndex = 0; wordIndex < word.Length; wordIndex++)
-                {
+                        {
                             if (word[wordIndex] == currentChar)
-                    {
+                            {
                                 intersections.Add((row, col, currentChar, wordIndex));
                             }
                         }
@@ -127,7 +163,7 @@ public class algorithm
 
         // проверка возможности размещения горизонтального слова
         private bool CanPlaceHorizontal(string word, (int row, int col, char letter, int wordIndex) intersections)
-                        {
+        {
             int startCol = intersections.col - intersections.wordIndex; // вычисл начальный столбец для слова
             int endCol = startCol + word.Length - 1; // вычисл конечный столбец для слова
             if (startCol < 0)
@@ -140,13 +176,13 @@ public class algorithm
             for (int i = 0; i < word.Length; i++)
             {
                 int checkCol = startCol + i;
-                
-                if (checkCol < currentRowLenght && checkCol >= 0) 
+
+                if (checkCol < currentRowLenght && checkCol >= 0)
                 {
                     // если клетка уже занята, проверяем совпадение 
                     if (grid[currentRow][checkCol] != '\0' && grid[currentRow][checkCol] != word[i])
-                        return false; 
-                        }
+                        return false;
+                }
             }
             return true;
         }
@@ -157,30 +193,30 @@ public class algorithm
             int endRow = startRow + word.Length - 1;
 
             // проверка границ 
-            if (startRow < 0) 
+            if (startRow < 0)
                 return false;
 
             int currentCol = intersections.col;
 
             // проверяем конфликты
-            for (int i = 0;i < word.Length;i++)
-                        {
+            for (int i = 0; i < word.Length; i++)
+            {
                 int checkRow = startRow + i;
 
                 if (checkRow < grid.Length && checkRow >= 0)
-                        {
+                {
                     // если строка существует 
                     if (grid[checkRow] != null && currentCol < grid[checkRow].Length)
-                            {
+                    {
                         if (grid[checkRow][currentCol] != '\0' && grid[checkRow][currentCol] != word[i])
                             return false;
-                            }
-                        }
-                        else { continue; }
-                        
                     }
-            return true;
                 }
+                else { continue; }
+
+            }
+            return true;
+        }
 
         // размещ горизонт слова
         private void PlaceHorizontal(string word, (int row, int col, char letter, int wordIndex) intersection)
@@ -199,32 +235,32 @@ public class algorithm
             for (int i = 0; i < word.Length; i++)
             {
                 grid[currentRow][startCol + i] = word[i];
-        }
+            }
             Console.WriteLine($"Размещено горизонтально: {word}");
-    }
+        }
 
         // то же самое размещение, но теперь вертикального слова 
         private void PlaceVertical(string word, (int row, int col, char letter, int wordIndex) intersection)
-    {
+        {
             int startRow = intersection.row - intersection.wordIndex;
             int currentCol = intersection.col;
-            int requiredRows = startRow + word.Length; 
+            int requiredRows = startRow + word.Length;
 
             if (requiredRows > grid.Length)
-        {
+            {
                 Array.Resize(ref grid, requiredRows);
-        }
+            }
 
-            for (int i = 0;i < word.Length;i++)
-        {
+            for (int i = 0; i < word.Length; i++)
+            {
                 int currentRow = startRow + i;
 
                 // Если стркоа не существует, создаём её
                 if (grid[currentRow] == null)
-            {
+                {
                     grid[currentRow] = new char[currentCol + 1];
 
-            }
+                }
                 // Если столбца не существует, расширяем строку
                 else if (currentCol >= grid[currentRow].Length)
                 {
@@ -235,7 +271,7 @@ public class algorithm
             Console.WriteLine($"Размещено вертикально: {word}");
         }
 
-        
+
         // Визуализация кроссворда в консоли
         public void PrintCrossword()
         {
@@ -243,7 +279,7 @@ public class algorithm
             {
                 Console.WriteLine("Кроссворд пуст");
                 return;
-    }
+            }
 
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             int maxWidth = grid.Max(row => row?.Length ?? 0);
@@ -256,7 +292,7 @@ public class algorithm
             {
                 Console.Write("───");
                 if (j < maxWidth - 1) Console.Write("┬");
-}
+            }
             Console.WriteLine("┐");
 
             // Содержимое таблицы
@@ -264,7 +300,7 @@ public class algorithm
             {
                 Console.Write("│");
                 for (int j = 0; j < maxWidth; j++)
-{
+                {
                     char cell = (j < grid[i]?.Length) ? grid[i][j] : '\0';
                     string output = (cell == '\0') ? " " : cell.ToString();
                     Console.Write($" {output} │"); // Каждая ячейка в своем блоке
@@ -282,7 +318,7 @@ public class algorithm
                     }
                     Console.WriteLine("┤");
                 }
-}
+            }
 
             // Нижняя граница таблицы
             Console.Write("└");
@@ -294,6 +330,5 @@ public class algorithm
             Console.WriteLine("┘");
         }
     }
-    
-}
 
+}

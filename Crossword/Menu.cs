@@ -8,7 +8,7 @@ namespace GUI
 
 	{
 		private Words DataWords = new Words();
-		private char[][] WordsArr;
+		public char[][] WordsArr;
 		public visualBox()
 		{
 			WordsArr = DataWords.JaggedCharArr;

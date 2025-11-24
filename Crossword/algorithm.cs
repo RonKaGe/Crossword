@@ -1,25 +1,75 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using Microsoft.VisualBasic;
+﻿
 using GUI;
 namespace CrosswordGen
 {
+    public class PlacedWord
+    {
+        public string Word;
+        public int Row;
+        public int Col;
+        public bool IsHorizontal;
+    }
     public class algorithm
     {
         private char[][] grid;
         private Random random;
         private List<string> words;
+        private List<PlacedWord> placedWords = new List<PlacedWord>();
+
+        public List<PlacedWord> FindWordsByCell(int r, int c)
+        {
+            var result = new List<PlacedWord>();
+
+            foreach (var w in placedWords)
+            {
+                if (w.IsHorizontal)
+                {
+                    if (r == w.Row && c >= w.Col && c < w.Col + w.Word.Length)
+                        result.Add(w);
+                }
+                else
+                {
+                    if (c == w.Col && r >= w.Row && r < w.Row + w.Word.Length)
+                        result.Add(w);
+                }
+            }
+
+            return result;
+        }
+
+        public void AskUserForCoordinates()
+        {
+            while (true)
+            {
+                Console.Write("\nВведите номер строки (или -1 для выхода): ");
+                if (!int.TryParse(Console.ReadLine(), out int r) || r < 0)
+                    break;
+
+                Console.Write("Введите номер столбца: ");
+                if (!int.TryParse(Console.ReadLine(), out int c))
+                    break;
+
+                var words = FindWordsByCell(r, c);
+
+                if (words.Count == 0)
+                {
+                    Console.WriteLine("Эта клетка не принадлежит ни одному слову.");
+                }
+                else
+                {
+                    Console.WriteLine("Слова, которым принадлежит эта буква:");
+                    foreach (var w in words)
+                    {
+                        Console.WriteLine($" - {w.Word} ({(w.IsHorizontal ? "горизонтально" : "вертикально")})");
+                    }
+                }
+            }
+        }
 
 
         public algorithm()
         {
             random = new Random();
-            grid = new char[0][];
             visualBox menu = new visualBox();
             words = menu.ListOfWords();
         }
@@ -94,45 +144,9 @@ namespace CrosswordGen
             }
             return false;
 
-        if (intersections.Count == 0)
-            return true; 
-
-        foreach (var intersection in intersections)
-            {
-                if (IsHorizontalWordAt(intersection.row, intersection.col))
-                    return true;
-
-                if (IsVerticalWordAt(intersection.row, intersection.col))
-                    return false;
-            }
-            return random.Next(2) == 0;
+   
         }
 
-        private bool IsHorizontalWordAt(int row, int col)
-        {
-            if (grid[row] == null || col >= grid[row].Length)
-                return false;
-
-            bool hasLeftNeighbor = col > 0 && grid[row][col - 1] != '\0';
-            bool hasRightNeighbor = col < grid[row].Length - 1 && grid[row][col + 1] != '\0';
-
-            return hasLeftNeighbor || hasRightNeighbor;
-        }
-
-        private bool IsVerticalWordAt(int row, int col)
-        {
-            bool hasTopNeighbor = row > 0 &&
-                                 grid[row - 1] != null &&
-                                 col < grid[row - 1].Length &&
-                                 grid[row - 1][col] != '\0';
-
-            bool hasBottomNeighbor = row < grid.Length - 1 &&
-                                    grid[row + 1] != null &&
-                                    col < grid[row + 1].Length &&
-                                    grid[row + 1][col] != '\0';
-
-            return hasTopNeighbor || hasBottomNeighbor;
-        }
         private List<(int row, int col, char letter, int wordIndex)> FindAllIntersections(string word)
         {
             var intersections = new List<(int row, int col, char letter, int wordIndex)>(); // это нужно, чтобы вставить новое слово и определить,
@@ -237,6 +251,13 @@ namespace CrosswordGen
                 grid[currentRow][startCol + i] = word[i];
             }
             Console.WriteLine($"Размещено горизонтально: {word}");
+            placedWords.Add(new PlacedWord
+            {
+                Word = word,
+                Row = currentRow,
+                Col = startCol,
+                IsHorizontal = true
+            });
         }
 
         // то же самое размещение, но теперь вертикального слова 
@@ -269,6 +290,13 @@ namespace CrosswordGen
                 grid[currentRow][currentCol] = word[i];
             }
             Console.WriteLine($"Размещено вертикально: {word}");
+            placedWords.Add(new PlacedWord
+            {
+                Word = word,
+                Row = startRow,
+                Col = currentCol,
+                IsHorizontal = false
+            });
         }
 
 

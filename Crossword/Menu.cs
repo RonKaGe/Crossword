@@ -55,7 +55,8 @@ namespace GUI
 							algorithm NewCros = new algorithm();
 							NewCros.Generate(ListOfWords());
 							NewCros.PrintCrossword();
-							WaitingForButton();
+                            NewCros.AskUserForCoordinates();
+                            WaitingForButton();
 							break;
 						case 6:
 							EndOfProgramm = true;

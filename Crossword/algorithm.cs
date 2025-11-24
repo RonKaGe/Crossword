@@ -11,22 +11,18 @@ namespace CrosswordGen
 {
 public class algorithm
 {
-        private char[][] grid;
+    private char[][] grid;
     private Random random;
-        private List<string> words;
+    private List<string> words;
 
-    public List<char[]> WordsToPlace = new List<char[]>();
-    List<PlaceWord> placeWords = new List<PlaceWord>();
-    List<char[]> MissWords = new List<char[]>();
 
     public algorithm()
     {
-        menu = new visualBox();
         random = new Random();
-            grid = new char[0][];
-            visualBox menu = new visualBox();
-            words = menu.ListOfWords();
-        }
+        grid = new char[0][];
+        visualBox menu = new visualBox();
+        words = menu.ListOfWords();
+    }
         // Основной метод генерации массива
         public char[][] Generate(List<string> inputWords)  // Метод, который возвращает рваный массив 
         {

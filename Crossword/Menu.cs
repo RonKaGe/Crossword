@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;       // библиотека для проверки на русские буквы
 using System.Xml.Serialization;
 using DataBase;
+using CrosswordGen;
 namespace GUI
 {
 	public class visualBox
@@ -51,6 +52,9 @@ namespace GUI
 							ShowArr();
 							break;
 						case 5:
+							algorithm NewCros = new algorithm();
+							NewCros.Generate(ListOfWords());
+							NewCros.PrintCrossword();
 							WaitingForButton();
 							break;
 						case 6:

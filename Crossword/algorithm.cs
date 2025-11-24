@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Microsoft.VisualBasic;
-
-namespace GUI
+using GUI;
+namespace CrosswordGen
 {
     public class algorithm
     {
@@ -19,7 +19,8 @@ namespace GUI
         {
             random = new Random();
             grid = new char[0][];
-            words = new List<string>();
+            visualBox menu = new visualBox();
+            words = menu.ListOfWords();
         }
         // Основной метод генерации массива
         public char[][] Generate(List<string> inputWords)  // Метод, который возвращает рваный массив 
@@ -47,7 +48,7 @@ namespace GUI
             {
                 if (!TryPlaceWord(words[i]))
                 {
-                    Console.WriteLine("Не удалось разместить слово: {words[i]}");
+                    Console.WriteLine($"Не удалось разместить слово: {words[i]}");
                 }
             }
         }
@@ -57,7 +58,7 @@ namespace GUI
             grid = new char[1][]; // Созд массив из одной строки с первым словом
             grid[0] = word.ToCharArray();
 
-            Console.WriteLine("Размещено первое слово: {word}");
+            Console.WriteLine($"Размещено первое слово: {word}");
         }
         private bool TryPlaceWord(string word) // Размещ слово в существующей структуре
         {
@@ -196,7 +197,7 @@ namespace GUI
             {
                 grid[currentRow][startCol + i] = word[i];
             }
-            Console.WriteLine("Размещено горизонтально: {word}");
+            Console.WriteLine($"Размещено горизонтально: {word}");
         }
 
         // то же самое размещение, но теперь вертикального слова 
@@ -228,55 +229,67 @@ namespace GUI
                 }
                 grid[currentRow][currentCol] = word[i];
             }
-            Console.WriteLine("Размещено вертикально: {word}");
+            Console.WriteLine($"Размещено вертикально: {word}");
         }
 
+        
         // Визуализация кроссворда в консоли
         public void PrintCrossword()
         {
             if (grid == null || grid.Length == 0)
             {
-                Console.WriteLine("Кроссворд пуст: ");
+                Console.WriteLine("Кроссворд пуст");
                 return;
             }
 
-            //Находим максимальную ширину длля красивого вывода 
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             int maxWidth = grid.Max(row => row?.Length ?? 0);
 
-            Console.WriteLine("\n Сгенерированный кроссворд: ");
-            Console.WriteLine(new string('=', maxWidth * 2 + 3));
+            Console.WriteLine("\nСгенерированный кроссворд:");
 
+            // Верхняя граница таблицы
+            Console.Write("┌");
+            for (int j = 0; j < maxWidth; j++)
+            {
+                Console.Write("───");
+                if (j < maxWidth - 1) Console.Write("┬");
+            }
+            Console.WriteLine("┐");
+
+            // Содержимое таблицы
             for (int i = 0; i < grid.Length; i++)
             {
-                Console.Write("| ");
-                if (grid[i] != null)
-                { // выводим все символы текущей строки
-                    for (int j = 0; j < grid[i].Length; j++)
-                    {
-                        char cell = grid[i][j];
-                        // если клетка пустая - ставим точку, иначе букву 
-                        Console.Write((cell == '\0' ? '.' : cell) + " ");
-                    }
-                    // дополняем оставшиеся клетки точками 
-                    for (int j = grid[i].Length; j < maxWidth; j++)
-                    {
-                        Console.Write(". ");
-                    }
-                }
-                else
+                Console.Write("│");
+                for (int j = 0; j < maxWidth; j++)
                 {
-                    // пустая строка - заполняем всё точками 
+                    char cell = (j < grid[i]?.Length) ? grid[i][j] : '\0';
+                    string output = (cell == '\0') ? " " : cell.ToString();
+                    Console.Write($" {output} │"); // Каждая ячейка в своем блоке
+                }
+                Console.WriteLine();
+
+                // Разделитель между строками (кроме последней)
+                if (i < grid.Length - 1)
+                {
+                    Console.Write("├");
                     for (int j = 0; j < maxWidth; j++)
                     {
-                        Console.Write(". ");
+                        Console.Write("───");
+                        if (j < maxWidth - 1) Console.Write("┼");
                     }
+                    Console.WriteLine("┤");
                 }
-                Console.WriteLine("|"); // правая граница + переход на новую строку
             }
-            // нижняя граница 
-            Console.WriteLine(new string('=', maxWidth * 2 + 3 ));
-        }
 
+            // Нижняя граница таблицы
+            Console.Write("└");
+            for (int j = 0; j < maxWidth; j++)
+            {
+                Console.Write("───");
+                if (j < maxWidth - 1) Console.Write("┴");
+            }
+            Console.WriteLine("┘");
+        }
     }
        
 }
